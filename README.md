@@ -2,7 +2,7 @@
 
 指定 Windows 游戏窗口，用截图模板匹配识别按钮并自动点击，循环执行匹配流程。
 
-**v1.0** · Windows 10/11 x64 · MIT · [AI 生成声明](AI_DISCLOSURE.md)
+**v1.1** · Windows 10/11 x64 · MIT · [AI 生成声明](AI_DISCLOSURE.md)
 
 ![界面](assets/screenshot.png)
 
@@ -16,11 +16,11 @@
 - GUI 控制、参数自动保存、实时日志
 - 点击随机偏移，点击后鼠标停留在按钮上
 - 管理员权限检测
-- 模板支持多张（不同背景），ESC 半透明按钮单独阈值
+- 模板已内置（前往、开始匹配、ESC ×3、确认），下载即用
 
 ## 下载
 
-- [Releases](../../releases/latest) 下载 `NTE-GameAutoRun-v1.0-win64.zip`
+- [Releases](../../releases/latest) 下载 `NTE-GameAutoRun-v1.1-win64.zip`
 - 解压后运行 `NTE-GameAutoRun.exe`（建议以管理员身份运行）
 
 源码运行：
@@ -34,20 +34,18 @@ python -m venv .venv
 ## 使用
 
 1. 游戏设为**窗口化 / 无边框窗口**，停在「咔滋！黄金双脆」活动页面（右下角有「前往」按钮）
-2. 运行 `NTE-GameAutoRun.exe`
-3. 点“采集模板”，依次采集：前往、开始匹配、ESC、确认
-4. 选择游戏窗口 → 开始
+2. 右键 `NTE-GameAutoRun.exe` → **以管理员身份运行**
+3. 选择游戏窗口 → 点“开始”
+
+模板已内置，无需采集。
 
 热键：`F9` 暂停/继续，`F10` 停止，鼠标移到屏幕左上角急停。
 
 ## 模板
 
-- 文件名：`前往.png`、`开始匹配.png`、`ESC.png`、`确认.png`
-- 同一按钮可采集多张：`前往_2.png`、`ESC_2.png`
-- ESC 是半透明按钮，建议在不同背景下采 2~3 张（如 `ESC.png`、`ESC_2.png`）
-- 只框按钮本体，不要带太多会变化的背景
-- 采集时记录窗口尺寸到 `templates/meta.json`，换分辨率后模板会按比例缩放
-- ESC 默认阈值 0.78，其他按钮使用界面上的全局阈值
+- 已内置在 `templates/`：`前往.png`、`开始匹配.png`、`ESC.png`、`ESC_2.png`、`ESC_3.png`、`确认.png`
+- 如需替换，直接替换同名 png；同一按钮支持 `_2`、`_3` 多张，程序取最高分
+- `templates/meta.json` 记录采集时的窗口尺寸，换分辨率后模板按比例缩放
 
 ## 配置
 
@@ -82,14 +80,13 @@ python -m venv .venv
 输出：
 
 - `dist\NTE-GameAutoRun.exe`
-- `dist\NTE-TemplateCapture.exe`
-- `release\NTE-GameAutoRun-v1.0-win64.zip`
+- `release\NTE-GameAutoRun-v1.1-win64.zip`（含 exe 和 templates）
 
 ## 版本
 
 - 版本号唯一来源：`version.py`
 - 变更记录：`CHANGELOG.md`
-- 发布打 tag：`git tag v1.0`
+- 发布打 tag：`git tag v1.1`
 
 ## 免责声明
 

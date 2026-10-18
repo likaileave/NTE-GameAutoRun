@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# NTE-GameAutoRun v1.0
+# NTE-GameAutoRun v1.1
 # Copyright (c) 2026 钻非恒久远
 # SPDX-License-Identifier: MIT
 # AI 声明：本文件在 AI 编程助手辅助下完成，详见 AI_DISCLOSURE.md
@@ -576,7 +576,7 @@ def check_templates() -> dict[str, list[tuple[Path, np.ndarray]]] | None:
         for key in missing:
             log.error("  - %s.png", key)
         log.error("")
-        log.error("请先运行  run_make_template.bat  采集模板。")
+        log.error("发布包应自带 templates 目录，请确认已完整解压；缺失请重新下载。")
         log.error("模板目录：%s", TEMPLATE_DIR)
         return None
     return templates

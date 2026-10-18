@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# NTE-GameAutoRun v1.0
+# NTE-GameAutoRun v1.1
 # Copyright (c) 2026 钻非恒久远
 # SPDX-License-Identifier: MIT
 # AI 声明：本文件在 AI 编程助手辅助下完成，详见 AI_DISCLOSURE.md
@@ -15,10 +15,7 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import queue
-import subprocess
-import sys
 import threading
 import tkinter as tk
 import traceback
@@ -281,9 +278,6 @@ class BotGUI:
             label.pack(side="left", padx=(3, 14))
             self.template_vars[key] = var
             self.template_labels[key] = label
-        ttk.Button(tpl_frame, text="采集模板", command=self.open_template_tool).pack(
-            side="right"
-        )
         ttk.Button(tpl_frame, text="刷新", command=self.refresh_templates).pack(
             side="right", padx=4
         )
@@ -359,20 +353,6 @@ class BotGUI:
                 fg="#2e8b57" if exists else "#c0392b"
             )
 
-    def open_template_tool(self) -> None:
-        if getattr(sys, "frozen", False):
-            exe = Path(sys.executable).parent / "NTE-TemplateCapture.exe"
-            if exe.exists():
-                subprocess.Popen([str(exe)])
-            else:
-                messagebox.showerror("错误", "找不到 TemplateCapture.exe。")
-            return
-        bat = BASE_DIR / "run_make_template.bat"
-        if not bat.exists():
-            messagebox.showerror("错误", f"找不到 {bat.name}")
-            return
-        os.startfile(str(bat))
-
     def show_about(self) -> None:
         messagebox.showinfo(
             "关于",
@@ -415,7 +395,7 @@ class BotGUI:
         if templates is None:
             messagebox.showerror(
                 "缺少模板",
-                "四个按钮模板不完整，请先点“采集模板”或运行 run_make_template.bat。",
+                "发布包应自带 templates 目录，请确认已完整解压；缺失请重新下载。",
             )
             return
 

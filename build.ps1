@@ -18,16 +18,12 @@ if ($LASTEXITCODE -ne 0) { throw "依赖安装失败" }
     --name NTE-GameAutoRun --icon "assets\icon.ico" gui.py
 if ($LASTEXITCODE -ne 0) { throw "GUI 打包失败" }
 
-& ".venv\Scripts\pyinstaller.exe" --noconfirm --clean --onefile --console `
-    --name NTE-TemplateCapture --icon "assets\icon.ico" make_template.py
-if ($LASTEXITCODE -ne 0) { throw "模板采集工具打包失败" }
-
 New-Item -ItemType Directory -Force "release" | Out-Null
 $zip = "release\NTE-GameAutoRun-v$version-win64.zip"
 if (Test-Path $zip) { Remove-Item $zip -Force }
 Compress-Archive -Path `
     "dist\NTE-GameAutoRun.exe", `
-    "dist\NTE-TemplateCapture.exe", `
+    "templates", `
     "config.example.json", `
     "gui_settings.example.json", `
     "README.md", `
