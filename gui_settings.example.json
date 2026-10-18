@@ -1,0 +1,7 @@
+{
+  "threshold": 0.85,
+  "click_jitter": 4,
+  "wait_after_click": 3.0,
+  "esc_interval": 3.0,
+  "step_timeout": 60.0
+}

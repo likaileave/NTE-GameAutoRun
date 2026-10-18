@@ -1,0 +1,26 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 构建产物
+dist/
+build/
+*.spec
+release/
+
+# 运行数据
+logs/
+debug/
+*.log
+config.json
+gui_settings.json
+
+# 用户采集的模板（避免提交游戏素材）
+templates/*.png
+templates/meta.json
+
+# 编辑器
+.vscode/
+.idea/
