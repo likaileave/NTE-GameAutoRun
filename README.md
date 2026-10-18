@@ -63,28 +63,11 @@ python -m venv .venv
 ## 适配
 
 - Windows 10/11 x64
-- **游戏客户区 1920x1080，允许 ±10%**（如 1936x1119 可用；超出范围会提示并阻止启动）
+- **游戏客户区 1920x1080，允许 ±10%**（超出范围会提示并阻止启动）
 - 窗口化、无边框全屏
-- 高 DPI、多显示器
 - 管理员 / 普通权限（启动时检测）
 - 中文路径
-
-## 构建
-
-```powershell
-.\build.ps1
-```
-
-输出：
-
-- `dist\NTE-GameAutoRun.exe`
-- `release\NTE-GameAutoRun-v1.1-win64.zip`（含 exe 和 templates）
-
-## 版本
-
-- 版本号唯一来源：`version.py`
-- 变更记录：`CHANGELOG.md`
-- 发布打 tag：`git tag v1.1`
+- 已验证 1920x1080、2560x1440 显示器
 
 ## 免责声明
 
