@@ -4,8 +4,6 @@
 
 **v1.1** · Windows 10/11 x64 · MIT · [AI 生成声明](AI_DISCLOSURE.md)
 
-![界面](assets/screenshot.png)
-
 ## 功能
 
 - 绑定窗口，模板匹配按钮并自动点击
