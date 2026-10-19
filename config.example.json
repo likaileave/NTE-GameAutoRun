@@ -1,10 +1,10 @@
 {
   "threshold": 0.85,
   "poll_interval": 0.3,
-  "wait_after_click": 3.0,
-  "esc_interval": 3.0,
+  "wait_after_click": 1.0,
+  "esc_interval": 5.0,
   "esc_timeout": 0,
-  "step_timeout": 60.0,
+  "step_timeout": 30.0,
   "special_interval": 1.0,
   "confirm_timeout": 3.0,
   "finish_timeout": 90.0,
@@ -12,7 +12,7 @@
   "max_rounds": 0,
   "click_mode": "front",
   "restore_cursor": false,
-  "click_jitter": 4,
+  "click_jitter": 8,
   "debug_save": false,
   "enable_failsafe": true,
   "check_progress": true,
@@ -25,6 +25,6 @@
     "top_left": [0.0, 0.0, 0.35, 0.3],
     "center": [0.2, 0.2, 0.8, 0.8],
     "center_right": [0.5, 0.2, 0.85, 0.8],
-    "progress": [0.866, 0.831, 0.958, 0.864]
+    "progress": [0.858, 0.831, 0.965, 0.864]
   }
 }

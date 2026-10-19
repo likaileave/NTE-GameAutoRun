@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# NTE-GameAutoRun v1.1
+# NTE-GameAutoRun v1.2
 # Copyright (c) 2026 钻非恒久远
 # SPDX-License-Identifier: MIT
 # AI 声明：本文件在 AI 编程助手辅助下完成，详见 AI_DISCLOSURE.md
@@ -43,6 +43,7 @@ import logging
 import math
 import os
 import random
+import re
 import sys
 import time
 from dataclasses import dataclass, field
@@ -254,71 +255,62 @@ def save_png(path: Path, image: np.ndarray) -> None:
     buffer.tofile(str(path))
 
 
+_ocr_engine = None
+
+
+def _get_ocr_engine():
+    global _ocr_engine
+    if _ocr_engine is None:
+        from rapidocr_onnxruntime import RapidOCR
+        _ocr_engine = RapidOCR()
+    return _ocr_engine
+
+
 def is_progress_full(
     frame: np.ndarray, region: tuple[float, float, float, float]
 ) -> bool | None:
     """
-    判断“已获得 X/Y”是否已经打满。
-    满时分子和分母的数字完全相同，直接比较两侧数字图像即可，不需要识别具体数值。
-    返回 True=已满，False=未满，None=识别不到（可能不在活动界面）。
+    用 OCR 读取“已获得 X/Y”的完整数字，比较 X 与 Y。
+    返回 True=已满，False=未满，None=识别失败。
     """
     height, width = frame.shape[:2]
     left, top, right, bottom = region
-    roi = frame[int(top * height):int(bottom * height), int(left * width):int(right * width)]
+    pad_x = max(4, int(width * 0.01))
+    pad_y = max(2, int(height * 0.006))
+    x1 = max(0, int(left * width) - pad_x)
+    y1 = max(0, int(top * height) - pad_y)
+    x2 = min(width, int(right * width) + pad_x)
+    y2 = min(height, int(bottom * height) + pad_y)
+    roi = frame[y1:y2, x1:x2]
     if roi.size == 0:
         return None
 
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-    _, binary = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
-    roi_h, roi_w = binary.shape[:2]
-
-    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    chars = []
-    for contour in contours:
-        x, y, cw, ch = cv2.boundingRect(contour)
-        if ch < 12 or cw < 3:
-            continue
-        if cw > roi_w * 0.9 and ch > roi_h * 0.9:
-            continue
-        chars.append((x, y, cw, ch))
-    if len(chars) < 3:
-        return None
-    chars.sort(key=lambda box: box[0])
-
-    best_slash = None
-    for x, y, cw, ch in chars:
-        if ch < 18:
-            continue
-        char = binary[y:y + ch, x:x + cw]
-        rows = [row for row in range(ch) if char[row].any()]
-        if len(rows) < 8:
-            continue
-        centers = [float(np.mean(np.where(char[row])[0])) for row in rows]
-        slope = abs(centers[-1] - centers[0])
-        if slope < 4:
-            continue
-        if best_slash is None or slope > best_slash[0]:
-            best_slash = (slope, x + cw // 2)
-    if best_slash is None:
-        return None
-    slash_x = best_slash[1]
-
-    left_boxes = [box for box in chars if box[0] + box[2] <= slash_x]
-    right_boxes = [box for box in chars if box[0] >= slash_x]
-    if not left_boxes or not right_boxes:
+    _, binary = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY)
+    binary = 255 - binary  # 白底黑字，OCR 更稳
+    binary = cv2.resize(binary, None, fx=4.0, fy=4.0, interpolation=cv2.INTER_NEAREST)
+    try:
+        result, _ = _get_ocr_engine()(
+            binary, use_det=False, use_cls=False, use_rec=True
+        )
+    except Exception as exc:
+        log.debug("OCR 失败：%s", exc)
         return None
 
-    left_chars = [binary[b[1]:b[1] + b[3], b[0]:b[0] + b[2]] for b in left_boxes]
-    right_chars = [binary[b[1]:b[1] + b[3], b[0]:b[0] + b[2]] for b in right_boxes]
-    if len(left_chars) != len(right_chars):
-        return False
+    texts = [str(item[0]) for item in result] if result else []
+    text = " ".join(texts).replace(" ", "")
+    log.debug("进度 OCR：%s", text)
 
-    for a, b in zip(left_chars, right_chars):
-        a = cv2.resize(a, (24, 32), interpolation=cv2.INTER_NEAREST)
-        b = cv2.resize(b, (24, 32), interpolation=cv2.INTER_NEAREST)
-        if float(np.mean(a != b)) > 0.15:
-            return False
-    return True
+    match = re.search(r"(\d[\d,]*)/(\d[\d,]*)", text)
+    if not match:
+        return None
+    current_text, total_text = match.group(1), match.group(2)
+    current = int(current_text.replace(",", ""))
+    total = int(total_text.replace(",", ""))
+    if total <= 0:
+        return None
+    log.info("任务进度：%s / %s", current_text, total_text)
+    return current >= total
 
 
 def create_sct():
@@ -369,10 +361,10 @@ DEFAULT_REGIONS: dict[str, tuple[float, float, float, float]] = {
 class Config:
     threshold: float = 0.85          # 模板相似度阈值
     poll_interval: float = 0.30      # 查找按钮的轮询间隔（秒）
-    wait_after_click: float = 3.0    # 每次点击后的等待（秒）
-    esc_interval: float = 3.0        # ESC 检测间隔（秒）
+    wait_after_click: float = 1.0    # 每次点击后的等待（秒）
+    esc_interval: float = 5.0        # ESC 检测间隔（秒）
     esc_timeout: float = 0.0         # ESC 最多等多久，0 = 一直等
-    step_timeout: float = 60.0       # 单步卡住超时（秒），超时进入特殊轮；0 = 不限
+    step_timeout: float = 30.0       # 单步卡住超时（秒），超时进入特殊轮；0 = 不限
     special_interval: float = 1.0    # 特殊轮快速扫描的间隔（秒）
     confirm_timeout: float = 3.0     # 点 ESC 后等「确认」出现的时长，超时则重按 ESC
     finish_timeout: float = 90.0     # 收尾阶段最多等多久（覆盖加载/结算），超时重开一轮
@@ -380,7 +372,7 @@ class Config:
     max_rounds: int = 0              # 最多跑几轮，0 = 无限
     click_mode: str = "front"        # front = 前台鼠标点击，message = 后台消息点击
     restore_cursor: bool = False     # False = 点击后鼠标留在按钮上
-    click_jitter: int = 4            # 点击位置随机偏移的最大像素（太大可能点出按钮）
+    click_jitter: int = 8            # 点击位置随机偏移的最大像素（太大可能点出按钮）
     debug_save: bool = False         # 保存未命中截图
     enable_failsafe: bool = True     # 鼠标移到左上角急停
     check_progress: bool = True      # 每轮开始时检查“已获得 X/Y”是否已满
@@ -858,7 +850,7 @@ class GameBot:
                     return "match"
 
             now = time.monotonic()
-            if now - last_log >= 15.0:
+            if now - last_log >= 10.0:
                 log.info("特殊轮仍在扫描当前界面...")
                 last_log = now
             self.smart_sleep(self.cfg.special_interval)
@@ -891,7 +883,7 @@ class GameBot:
                 return False
 
             now = time.monotonic()
-            if now - last_log >= 15.0:
+            if now - last_log >= 10.0:
                 log.info(
                     "仍在等待「ESC」...（最高相似度 %.2f，已等 %.0f 秒）",
                     self.last_scores.get("ESC", 0.0),

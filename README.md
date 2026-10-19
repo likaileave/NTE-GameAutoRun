@@ -2,7 +2,7 @@
 
 指定 Windows 游戏窗口，用截图模板匹配识别按钮并自动点击，循环执行匹配流程。
 
-**v1.1** · Windows 10/11 x64 · MIT · [AI 生成声明](AI_DISCLOSURE.md)
+**v1.2** · Windows 10/11 x64 · MIT · [AI 生成声明](AI_DISCLOSURE.md)
 
 ## 功能
 
@@ -14,11 +14,12 @@
 - GUI 控制、参数自动保存、实时日志
 - 点击随机偏移，点击后鼠标停留在按钮上
 - 管理员权限检测
+- OCR 读取活动进度数字并比较大小
 - 模板已内置（前往、开始匹配、ESC ×3、确认），下载即用
 
 ## 下载
 
-- [Releases](../../releases/latest) 下载 `NTE-GameAutoRun-v1.1-win64.zip`
+- [Releases](../../releases/latest) 下载 `NTE-GameAutoRun-v1.2-win64.zip`
 - 解压后运行 `NTE-GameAutoRun.exe`（建议以管理员身份运行）
 
 源码运行：
@@ -52,10 +53,10 @@ python -m venv .venv
 | 字段 | 默认 | 说明 |
 | --- | --- | --- |
 | `threshold` | 0.85 | 模板相似度阈值 |
-| `click_jitter` | 4 | 点击随机偏移（像素） |
-| `wait_after_click` | 3.0 | 点击后等待（秒） |
-| `esc_interval` | 3.0 | ESC 检测间隔（秒） |
-| `step_timeout` | 60 | 单步卡住超时（秒） |
+| `click_jitter` | 8 | 点击随机偏移（像素） |
+| `wait_after_click` | 1.0 | 点击后等待（秒） |
+| `esc_interval` | 5.0 | ESC 检测间隔（秒） |
+| `step_timeout` | 30 | 单步卡住超时（秒） |
 | `ignore_progress_full` | false | 活动奖励已满仍继续运行 |
 
 更多参数见 `config.example.json`。

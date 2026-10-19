@@ -15,6 +15,7 @@ if (-not (Test-Path $python)) {
 if ($LASTEXITCODE -ne 0) { throw "依赖安装失败" }
 
 & ".venv\Scripts\pyinstaller.exe" --noconfirm --clean --onefile --windowed `
+    --collect-data rapidocr_onnxruntime `
     --name NTE-GameAutoRun --icon "assets\icon.ico" gui.py
 if ($LASTEXITCODE -ne 0) { throw "GUI 打包失败" }
 

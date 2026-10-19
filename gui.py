@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# NTE-GameAutoRun v1.1
+# NTE-GameAutoRun v1.2
 # Copyright (c) 2026 钻非恒久远
 # SPDX-License-Identifier: MIT
 # AI 声明：本文件在 AI 编程助手辅助下完成，详见 AI_DISCLOSURE.md
